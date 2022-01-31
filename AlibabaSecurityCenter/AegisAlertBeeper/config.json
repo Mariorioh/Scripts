@@ -1,0 +1,9 @@
+{
+    "ali_api_access_id": "",
+    "ali_api_access_secret_key": "",
+    "mango_id": "",
+    "mango_token": "",
+    "mango_group_room_name": "",
+    "mango_group_room_id": "",
+    "base_send_url": "<mango's restful API server url>"
+}
