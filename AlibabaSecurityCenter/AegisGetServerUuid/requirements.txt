@@ -1,0 +1,4 @@
+aliyun-python-sdk-core-v3
+alibabacloud_tea_openapi
+aliyun-python-sdk-sas==1.1.10
+ujson==4.2.0

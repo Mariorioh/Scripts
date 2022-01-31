@@ -1,0 +1,34 @@
+===========================================================================
+Script Overview: 
+This python script allows the user to fetch Alibaba Security Center Alerts servers' UUID.
+
+Prerequisites
+1.) Install a python 3.6 or above.
+2.) Install the packages listed in the "requirements.txt" file.
+3.) In order to connect to the Alibaba API server. You need to have an access ID and secret key. Fill up the "config.json" file accordingly.
+
+Installation: 
+1.) Copy and paste the following files into your working directory:
+    - AegisGetServerUuid.py
+    - config.json
+2.) Edit the config.json file and fill it up with your corresponding access ID and secret key.
+
+How To Use
+1.) In your working directory, type in the help command line: 
+    >> python AegisGetServerUuid.py -h
+    >> usage: AegisGetServerUuid.py [-h] [--instanceName INSTANCENAME] [--intranetIP INTRANETIP] [--outputFile OUTPUTFILE] [--serverListFile SERVERLISTFILE] [--dir DIR]
+    >> 
+    >> options:
+    >>   -h, --help            show this help message and exit
+    >>   --instanceName INSTANCENAME, -in INSTANCENAME
+    >>                         Enter Instance Name
+    >>   --intranetIP INTRANETIP, -ip INTRANETIP
+    >>                         Enter intranet IP
+    >>   --outputFile OUTPUTFILE, -of OUTPUTFILE
+    >>                         Enter output file name (default is server_list_uuid.csv)
+    >>   --serverListFile SERVERLISTFILE, -slf SERVERLISTFILE
+    >>                         Enter server list file name (default is server_list.csv)
+    >>   --dir DIR, -d DIR     Enter directory name
+2.) Upon running the script. It will get each servers' UUID from the Alibaba Security Center.
+
+===========================================================================
