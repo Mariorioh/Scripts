@@ -16,6 +16,7 @@ import html2text
 import time
 from threading import Thread
 from os import path
+
 script_path = path.dirname(path.abspath(__file__)) + "/"
 verbose = True
 
@@ -126,7 +127,8 @@ class DescribeSuspEvents:
                 if detail.get('Type') == 'html':
                     # html = detail.get('ValueDisplay')
                     # alert_details_str += html2text.html2text(html)
-                    alert_details_str += DescribeSuspEvents.get_string_from_html(str(detail.get('ValueDisplay')))
+                    alert_details_str += DescribeSuspEvents.get_string_from_html(
+                        str(detail.get('ValueDisplay'))).strip()
                 else:
                     alert_details_str += str(detail.get('ValueDisplay')).strip()
                     alert_details_str += '\n'
@@ -143,7 +145,7 @@ class DescribeSuspEvents:
         str_detail = DescribeSuspEvents.get_string_from_html(str(susp_events.get('MarkMisRules'))).strip()
         str_status = str_operate_error_code = str(susp_events.get('OperateErrorCode'))
 
-        if not(str_detail == '' or str_detail is None):
+        if not (str_detail == '' or str_detail is None):
             str_detail = '\n详细内容: ' + str_detail
 
         if str_operate_error_code == 'advance_mark_mis_info.Success':
@@ -162,11 +164,13 @@ class DescribeSuspEvents:
     def get_string_from_html(input_html_text) -> str:
         html = html2text.HTML2Text()
         html.ignore_emphasis = True
-        html_text = input_html_text.replace('<strong>', '')\
-            .replace('<\\/strong>', '')\
-            .replace('</strong>', '')\
-            .replace(';', '')\
-            .replace('&nbsp', '&nbsp;')
+        html_text = input_html_text.replace('<strong>', '') \
+            .replace('<\\/strong>', '') \
+            .replace('</strong>', '') \
+            .replace(';', '') \
+            .replace('&nbsp', '&nbsp;') \
+            .replace('<code>', '') \
+            .replace('<\\/code>')
         return html.handle(html_text)
 
     @staticmethod
@@ -203,8 +207,15 @@ def log_to_file(filename, message):
 
 
 def is_server_ignored(instance_name: str, intranet_ip: str) -> bool:
-    return ('pino' in instance_name) or \
-           ('172.18' in intranet_ip)
+    ignore = False
+    if instance_name != '':  # and instance_name != 'None':
+        if 'pino' in instance_name:
+            ignore = True
+    if intranet_ip != '':  # and intranet_ip != 'None':
+        if '172.18' in intranet_ip:
+            ignore = True
+
+    return ignore
 
 
 def main():
@@ -265,4 +276,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
