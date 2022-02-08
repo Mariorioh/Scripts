@@ -31,8 +31,9 @@ class DescribeSuspEvents:
         pass
 
     @staticmethod
-    def get_suspected_events():  # -> tuple[set, str]:
+    def get_suspected_events():  # -> tuple[set, str, list]:
 
+        alerts_formatted_str_list = []
         alerts_formatted_str = ''
         alerts = set()
 
@@ -237,9 +238,10 @@ def pair_list_str(str_list: [str]):
     return paired_list_str
 
 
-def send_by_batch(str_list: [str], mango_bot: MangoBot):  # Sends a mango message containing at most 4 alerts each
+def send_by_batch(str_list: [str]):  # Sends a mango message containing at most 4 alerts each
     paired_list = pair_list_str(str_list)
     quad_list = pair_list_str(paired_list)
+    mango_bot = MangoBot()
 
     for msg in quad_list:
         Thread(target=mango_bot.send_msg, args=(msg,)).start()  # do sending to mango asynchronously
@@ -264,8 +266,7 @@ def main():
         if alerts_str != '':
             log_to_file(DescribeSuspEvents.output_file, alerts_str + '\n\n')
             # mango_bot.send_msg(alerts_str)
-
-            send_by_batch(alerts_str_list, mango_bot)
+            send_by_batch(alerts_str_list)
 
         # show handled alerts one last time with additional details, i.e. those with status != 1
         alerts_handled = alerts_last_time.difference(alerts_now)
@@ -285,7 +286,7 @@ def main():
                 print(tmp)
             log_to_file(DescribeSuspEvents.output_file, tmp)
             # mango_bot.send_msg(tmp)
-            send_by_batch(tmp_list, mango_bot)
+            send_by_batch(tmp_list)
             # Thread(target=mango_bot.send_msg, args=(tmp,)).start()  # do sending to mango asynchronously
 
             alerts_last_time.remove(alarm)  # update the set items
