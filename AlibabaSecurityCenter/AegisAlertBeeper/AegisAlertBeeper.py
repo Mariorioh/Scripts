@@ -60,21 +60,24 @@ class DescribeSuspEvents:
                                 ujson.dumps(response_json, indent=4, ensure_ascii=False).encode('utf-8').decode() +
                                 '\n\n')
 
-                    alerts, alerts_formatted_str = DescribeSuspEvents.get_alert_info(response_json)
+                    alerts, alerts_formatted_str, alerts_formatted_str_list = DescribeSuspEvents.get_alert_info(
+                        response_json)
 
         # send_msg(alerts_str)
         # print(alerts_str)
 
         # return a set of each alerts found using AlarmUniqueInfo key and its formatted output
-        return alerts, alerts_formatted_str
+        return alerts, alerts_formatted_str, alerts_formatted_str_list
 
     @staticmethod
     def get_alert_info(response_json):
         are_there_ignored_servers = False
         alert_info_str = ''
+        alert_info_str_list = []
         alert_set = set()  # a set of 'AlarmUniqueInfo' strings
 
         for alert in response_json.get('body', '').get('SuspEvents', ''):
+            alert_info = ''
             if is_server_ignored(str(alert.get('InstanceName')),
                                  str(alert.get('IntranetIp'))):
                 are_there_ignored_servers = True
@@ -86,22 +89,25 @@ class DescribeSuspEvents:
                     emoji = '✅✅✅'
 
                 alert_set.add(alert.get('AlarmUniqueInfo'))
-                alert_info_str += '{}SKG aegis alert:\n'.format(emoji) + \
+                alert_info += '{}SKG aegis alert:\n'.format(emoji) + \
                                   '描述: ' + str(alert.get('Desc')) + '\n' + \
                                   '实例名称: ' + str(alert.get('InstanceName')) + '\n' + \
                                   '互联网IP: ' + str(alert.get('InternetIp')) + '\n' + \
                                   '内网IP: ' + str(alert.get('IntranetIp')) + '\n'
 
-                alert_info_str += DescribeSuspEvents.get_alert_details(alert)
+                alert_info += DescribeSuspEvents.get_alert_details(alert)
 
                 if handled:
-                    alert_info_str += '\n' + DescribeSuspEvents.get_alert_handling_details(alert)
+                    alert_info += '\n' + DescribeSuspEvents.get_alert_handling_details(alert)
+
+                alert_info_str += alert_info
+                alert_info_str_list.append(alert_info)
 
         if are_there_ignored_servers:
             # alert_info_str += "\nThere are unhandled ignored servers."
             log_to_file(DescribeSuspEvents.debug_file, "There are unhandled ignored servers.\n")
 
-        return alert_set, alert_info_str
+        return alert_set, alert_info_str, alert_info_str_list
 
     @staticmethod
     def create_client(
@@ -218,6 +224,27 @@ def is_server_ignored(instance_name: str, intranet_ip: str) -> bool:
     return ignore
 
 
+def pair_list_str(str_list: [str]):
+    if not bool(str_list):
+        return []
+
+    list_length = len(str_list)
+    paired_list_str = [str_list[i] + str_list[i + 1] for i in range(0, list_length - 1, 2)]
+    if list_length % 2 == 1:
+        paired_list_str.append(str_list[list_length - 1])
+
+    # print(paired_list_str)
+    return paired_list_str
+
+
+def send_by_batch(str_list: [str], mango_bot: MangoBot):  # Sends a mango message containing at most 4 alerts each
+    paired_list = pair_list_str(str_list)
+    quad_list = pair_list_str(paired_list)
+
+    for msg in quad_list:
+        Thread(target=mango_bot.send_msg, args=(msg,)).start()  # do sending to mango asynchronously
+
+
 def main():
     alerts_now = set()
     alerts_last_time = set()
@@ -229,7 +256,7 @@ def main():
             print(time_str)
         log_to_file(DescribeSuspEvents.debug_file, time_str + '\n')
 
-        alerts_now, alerts_str = DescribeSuspEvents.get_suspected_events()
+        alerts_now, alerts_str, alerts_str_list = DescribeSuspEvents.get_suspected_events()
 
         if verbose:
             print(alerts_str)
@@ -237,7 +264,8 @@ def main():
         if alerts_str != '':
             log_to_file(DescribeSuspEvents.output_file, alerts_str + '\n\n')
             # mango_bot.send_msg(alerts_str)
-            Thread(target=mango_bot.send_msg, args=(alerts_str,)).start()  # do sending to mango asynchronously
+
+            send_by_batch(alerts_str_list, mango_bot)
 
         # show handled alerts one last time with additional details, i.e. those with status != 1
         alerts_handled = alerts_last_time.difference(alerts_now)
@@ -251,13 +279,14 @@ def main():
                         ujson.dumps(resp_json, indent=4, ensure_ascii=False).
                         encode('utf-8').decode() + '\n\n')
 
-            the_same_alarm, tmp = DescribeSuspEvents.get_alert_info(resp_json)
+            the_same_alarm, tmp, tmp_list = DescribeSuspEvents.get_alert_info(resp_json)
 
             if verbose:
                 print(tmp)
             log_to_file(DescribeSuspEvents.output_file, tmp)
             # mango_bot.send_msg(tmp)
-            Thread(target=mango_bot.send_msg, args=(tmp,)).start()  # do sending to mango asynchronously
+            send_by_batch(tmp_list, mango_bot)
+            # Thread(target=mango_bot.send_msg, args=(tmp,)).start()  # do sending to mango asynchronously
 
             alerts_last_time.remove(alarm)  # update the set items
 
