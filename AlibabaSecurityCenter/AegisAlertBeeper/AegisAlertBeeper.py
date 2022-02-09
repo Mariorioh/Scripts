@@ -230,6 +230,10 @@ def pair_list_str(str_list: [str]):
         return []
 
     list_length = len(str_list)
+
+    if list_length <= 2: 
+        return str_list
+    
     paired_list_str = [str_list[i] + str_list[i + 1] for i in range(0, list_length - 1, 2)]
     if list_length % 2 == 1:
         paired_list_str.append(str_list[list_length - 1])
