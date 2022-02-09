@@ -16,6 +16,7 @@ import html2text
 import time
 from threading import Thread
 from os import path
+from typing import List
 
 script_path = path.dirname(path.abspath(__file__)) + "/"
 verbose = True
@@ -225,7 +226,7 @@ def is_server_ignored(instance_name: str, intranet_ip: str) -> bool:
     return ignore
 
 
-def pair_list_str(str_list: [str]):
+def pair_list_str(str_list: List[str]):
     if not bool(str_list):
         return []
 
