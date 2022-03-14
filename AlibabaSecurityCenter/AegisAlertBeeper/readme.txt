@@ -16,15 +16,7 @@ Installation:
     - AccessKeyPair.py
     - config.json
     - script_runner.sh
-2.) Open the following files:
-    - AegisAlertBeeper.py
-    - MangoBot.py
-    - AccessKeyPair.py
-3.) Edit the line:
-    >> script_path = ""
-    replace with:
-    >> script_path = "<path/to/your/working/directory"
-4.) Edit the config.json file:
+2.) Edit the config.json file:
     - Fill up with your Alibaba Access ID, Secret Key, Mango Bot ID, Token, and Room ID accordingly.
 
 How To Use
@@ -48,7 +40,8 @@ In case you want to ensure that the script is always running in a linux server:
     >>
     >> * * * * * sudo bash /path/to/file/script_runner.sh 2>&1 | logger -t alert_beeper_tag
     >>
-    * The 4th line specifies to cron that every minute, run the script_running.sh script.
+    * The 4th line specifies to cron that every minute, run the script_runner.sh script.
+    * The script_runner.sh file checks if the python script is running, if it is not, it will start the said script.
   c.) To check the scheduled job, use the "-l" flag. Sample usage:
     >> crontab -l
   d.) Make sure the cron service is running. Use the command: 
