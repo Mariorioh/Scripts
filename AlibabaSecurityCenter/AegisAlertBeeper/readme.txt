@@ -31,7 +31,13 @@ How To Use
     - MangoBotDebug.log - Used for debugging
 
 In case you want to ensure that the script is always running in a linux server: 
-1.) Add a job to the cron service
+1.) The script_runner.sh file checks if the python script is running, if it is not, it will start the said script. 
+    Edit the script_runner.sh file so that the "/path/to/file" string is replaced by your actual working directory.
+    >> vim script_runner.sh
+    >> ...
+    >> command="sudo python3 /path/to/file/AegisAlertBeeper.py"
+    >> ...    
+2.) Add a job to the cron service
   a.) Create or edit the cron file using crontab command: 
     >> crontab -e
   b.) Put this line. Make sure a new line is included.
@@ -41,7 +47,6 @@ In case you want to ensure that the script is always running in a linux server:
     >> * * * * * sudo bash /path/to/file/script_runner.sh 2>&1 | logger -t alert_beeper_tag
     >>
     * The 4th line specifies to cron that every minute, run the script_runner.sh script.
-    * The script_runner.sh file checks if the python script is running, if it is not, it will start the said script.
   c.) To check the scheduled job, use the "-l" flag. Sample usage:
     >> crontab -l
   d.) Make sure the cron service is running. Use the command: 
