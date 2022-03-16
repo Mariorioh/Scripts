@@ -178,7 +178,15 @@ class DescribeSuspEvents:
             .replace(';', '') \
             .replace('&nbsp', '&nbsp;') \
             .replace('<code>', '') \
-            .replace('<\\/code>')
+            .replace('<\\/code>', '')\
+            .replace('<p>', '')\
+            .replace('<\\/p>', '')\
+            .replace('{', '')\
+            .replace('}', '')\
+            .replace('[', '')\
+            .replace(']', '')\
+            .replace('<', '')\
+            .replace('>', '')
         return html.handle(html_text)
 
     @staticmethod
