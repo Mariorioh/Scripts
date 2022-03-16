@@ -131,15 +131,8 @@ class DescribeSuspEvents:
         if alert_details is not None:
             for detail in alert_details:
                 alert_details_str += detail.get('NameDisplay') + ': '
-
-                if detail.get('Type') == 'html':
-                    # html = detail.get('ValueDisplay')
-                    # alert_details_str += html2text.html2text(html)
-                    alert_details_str += DescribeSuspEvents.get_string_from_html(
-                        str(detail.get('ValueDisplay'))).strip()
-                else:
-                    alert_details_str += str(detail.get('ValueDisplay')).strip()
-                    alert_details_str += '\n'
+                alert_details_str += DescribeSuspEvents.get_string_from_html(
+                    str(detail.get('ValueDisplay'))).strip()
 
         if alert_details_str == '':
             alert_details_str = '--Alert has no details--'
