@@ -143,7 +143,7 @@ class DescribeSuspEvents:
     def get_alert_handling_details(susp_events):
 
         str_operate_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(susp_events.get('OperateTime') / 1000))
-        str_detail = DescribeSuspEvents.get_string_from_html(str(susp_events.get('MarkMisRules'))).strip()
+        str_detail = DescribeSuspEvents.get_string_from_html(str(susp_events.get('MarkMisRules')), True).strip()
         str_status = str_operate_error_code = str(susp_events.get('OperateErrorCode'))
 
         if not (str_detail == '' or str_detail is None):
@@ -162,7 +162,7 @@ class DescribeSuspEvents:
                str_detail + '\n'
 
     @staticmethod
-    def get_string_from_html(input_html_text) -> str:
+    def get_string_from_html(input_html_text, isHTML: bool = False) -> str:
         html = html2text.HTML2Text()
         html.ignore_emphasis = True
         html_text = input_html_text.replace('<strong>', '') \
@@ -174,13 +174,23 @@ class DescribeSuspEvents:
             .replace('<\\/code>', '')\
             .replace('<p>', '')\
             .replace('<\\/p>', '')\
+            .replace('<a', '')\
+            .replace(r'<\/a>', '')\
             .replace('{', '')\
             .replace('}', '')\
             .replace('[', '')\
             .replace(']', '')\
             .replace('<', '')\
-            .replace('>', '')
-        return html.handle(html_text)
+            .replace('>', '')\
+            .replace('/p', '')\
+            .replace('/a', '')\
+            .replace(r'href=', '')\
+            .replace(r'&quot;', '')\
+            .replace('"', '')
+        if isHTML == False:
+            return html_text + '\n'
+        else:
+            return html.handle(html_text)
 
     @staticmethod
     def ali_sas_get_alerts(request_parameters: dict) -> dict:
